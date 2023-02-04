@@ -11,18 +11,20 @@ class MultiImagePickerController with ChangeNotifier {
 
   MultiImagePickerController({this.allowedImageTypes = const ['png', 'jpeg', 'jpg'], this.maxImages = 10, Iterable<ImageFile>? images}) {
     if (images != null) {
-      this.images = List.from(images);
+      _images = List.from(images);
     } else {
-      this.images = [];
+      _images = [];
     }
+    print('init');
   }
 
-  late final List<ImageFile> images;
+  late final List<ImageFile> _images;
 
   /// Returns [Iterable] of [ImageFile] that user has selected.
+  Iterable<ImageFile> get images => _images;
 
   /// Returns true if user has selected no images.
-  bool get hasNoImages => images.isEmpty;
+  bool get hasNoImages => _images.isEmpty;
 
   /// manually pick images. i.e. on click on external button.
   /// this method open Image picking window.
@@ -30,7 +32,7 @@ class MultiImagePickerController with ChangeNotifier {
   Future<bool> pickImages() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true, type: FileType.custom, allowedExtensions: allowedImageTypes);
     if (result != null && result.files.isNotEmpty) {
-      _addImages(result.files
+      addImages(result.files
           .where((e) => e.extension != null && allowedImageTypes.contains(e.extension?.toLowerCase()))
           .map((e) => ImageFile(name: e.name, extension: e.extension!, bytes: e.bytes, path: !kIsWeb ? e.path : null)));
       notifyListeners();
@@ -39,19 +41,19 @@ class MultiImagePickerController with ChangeNotifier {
     return false;
   }
 
-  void _addImages(Iterable<ImageFile> images) {
+  void addImages(Iterable<ImageFile> images) {
     int i = 0;
-    while (images.length < maxImages && images.length > i) {
-      this.images.add(images.elementAt(i));
+    while (_images.length < maxImages && images.length > i) {
+      _images.add(images.elementAt(i));
       i++;
     }
   }
 
   /// Manually re-order image, i.e. move image from one position to another position.
   void reOrderImage(int oldIndex, int newIndex, {bool notify = true}) {
-    final oldItem = images.removeAt(oldIndex);
+    final oldItem = _images.removeAt(oldIndex);
     oldItem.size;
-    images.insert(newIndex, oldItem);
+    _images.insert(newIndex, oldItem);
     if (notify) {
       notifyListeners();
     }
@@ -59,15 +61,15 @@ class MultiImagePickerController with ChangeNotifier {
 
   /// Manually remove image from list.
   void removeImage(ImageFile imageFile) {
-    images.remove(imageFile);
+    _images.remove(imageFile);
     notifyListeners();
   }
 
   @override
   void dispose() {
-    print(images);
+    print(_images);
     print('dispose');
     super.dispose();
-    print(images);
+    print(_images);
   }
 }
