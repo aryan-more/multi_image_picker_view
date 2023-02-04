@@ -11,20 +11,18 @@ class MultiImagePickerController with ChangeNotifier {
 
   MultiImagePickerController({this.allowedImageTypes = const ['png', 'jpeg', 'jpg'], this.maxImages = 10, Iterable<ImageFile>? images}) {
     if (images != null) {
-      _images = List.from(images);
+      this.images = List.from(images);
     } else {
-      _images = [];
+      this.images = [];
     }
-    print('init');
   }
 
-  late final List<ImageFile> _images;
+  late final List<ImageFile> images;
 
   /// Returns [Iterable] of [ImageFile] that user has selected.
-  Iterable<ImageFile> get images => _images;
 
   /// Returns true if user has selected no images.
-  bool get hasNoImages => _images.isEmpty;
+  bool get hasNoImages => images.isEmpty;
 
   /// manually pick images. i.e. on click on external button.
   /// this method open Image picking window.
@@ -43,17 +41,17 @@ class MultiImagePickerController with ChangeNotifier {
 
   void _addImages(Iterable<ImageFile> images) {
     int i = 0;
-    while (_images.length < maxImages && images.length > i) {
-      _images.add(images.elementAt(i));
+    while (images.length < maxImages && images.length > i) {
+      this.images.add(images.elementAt(i));
       i++;
     }
   }
 
   /// Manually re-order image, i.e. move image from one position to another position.
   void reOrderImage(int oldIndex, int newIndex, {bool notify = true}) {
-    final oldItem = _images.removeAt(oldIndex);
+    final oldItem = images.removeAt(oldIndex);
     oldItem.size;
-    _images.insert(newIndex, oldItem);
+    images.insert(newIndex, oldItem);
     if (notify) {
       notifyListeners();
     }
@@ -61,15 +59,15 @@ class MultiImagePickerController with ChangeNotifier {
 
   /// Manually remove image from list.
   void removeImage(ImageFile imageFile) {
-    _images.remove(imageFile);
+    images.remove(imageFile);
     notifyListeners();
   }
 
   @override
   void dispose() {
-    print(_images);
+    print(images);
     print('dispose');
     super.dispose();
-    print(_images);
+    print(images);
   }
 }
